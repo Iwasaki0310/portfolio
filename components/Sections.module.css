@@ -96,6 +96,19 @@
   text-transform: uppercase;
   color: var(--text-sub);
 }
+/* SP用の短縮肩書きは既定で隠す（PCはフル表記を1行で出す） */
+.enRoleShort {
+  display: none;
+}
+@media (max-width: 640px) {
+  .enRoleFull {
+    display: none;
+  }
+  .enRoleShort {
+    display: block;
+    margin-top: 4px;
+  }
+}
 
 /* 左のブロック（History / Vital 共通） */
 .aboutBlock {

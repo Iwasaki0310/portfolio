@@ -445,14 +445,19 @@
    * 人物を下げ＋ひと回り小さくして、顔の上端が肩書きの下に来るようにする。
    */
   .titleBlock {
-    top: clamp(84px, 12vh, 150px);
+    top: clamp(76px, 10vh, 140px);
     transform: none;
     left: 24px;
   }
+  /*
+   * 頭と肩書きのすき間を広く取る。以前は 375x812 で 10px しか空かず、
+   * 実機ではアドレスバーが表示領域を削る分そこが埋まって頭が文字に被った。
+   * 人物をひと回り小さく＋下げて、頭の位置を下げてクリアランスを稼ぐ。
+   */
   .person {
     left: 50%;
-    bottom: 8vh;
-    width: min(125vw, 470px);
+    bottom: 4vh;
+    width: min(120vw, 440px);
   }
   /* 左の雲：モバイルでは左下に配置（PCと同じ素材） */
   .cloudLeft {

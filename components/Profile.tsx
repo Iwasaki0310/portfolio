@@ -72,7 +72,12 @@ export default function Profile() {
 
             <div className={s.nameRow} data-reveal>
               <p className={s.profileName}>岩崎 怜</p>
-              <p className={s.profileNameEn}>Ren Iwasaki — Web Director / AI Creative Creator</p>
+              <p className={s.profileNameEn}>
+                <span>Ren Iwasaki</span>
+                {/* PCは肩書きをそのまま続け、SPは2行目に短縮版を出す */}
+                <span className={s.enRoleFull}> — Web Director / AI Creative Creator</span>
+                <span className={s.enRoleShort}>Web / AI Director</span>
+              </p>
             </div>
 
             {/* History */}

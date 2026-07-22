@@ -57,8 +57,19 @@ export default function Works() {
   const [dragging, setDragging] = useState(false);
   const [step, setStep] = useState(300);
 
-  // ドラッグ状態
-  const drag = useRef({ active: false, startX: 0, startProgress: 0, moved: false });
+  // ドラッグ状態（vx は指の速度 px/ms。フリック判定に使う）
+  const drag = useRef({
+    active: false,
+    startX: 0,
+    startProgress: 0,
+    moved: false,
+    lastX: 0,
+    lastT: 0,
+    vx: 0,
+  });
+
+  /* 指を払った判定のしきい値。これを超えたら移動距離が短くても1枚送る */
+  const FLICK = 0.35;
 
   // ドラッグ幅の基準（画面幅に応じてカード送り量を調整）
   useEffect(() => {
@@ -73,23 +84,49 @@ export default function Works() {
 
   const onPointerDown = useCallback(
     (e: React.PointerEvent) => {
+      // 2本目以降の指は無視（マルチタッチで座標が飛ぶのを防ぐ）
+      if (!e.isPrimary) return;
       drag.current = {
         active: true,
         startX: e.clientX,
         startProgress: progress,
         moved: false,
+        lastX: e.clientX,
+        lastT: e.timeStamp,
+        vx: 0,
       };
       setDragging(true);
-      (e.target as HTMLElement).setPointerCapture?.(e.pointerId);
+      /*
+       * 捕捉はステージ自身に取る。掴んだ子要素（画像・リンク・絵文字）に
+       * 取ると、ドラッグ中にその要素が pointer-events: none へ変わった時点で
+       * 追従が切れてカードが止まる。
+       */
+      stageRef.current?.setPointerCapture?.(e.pointerId);
     },
     [progress]
   );
 
   const onPointerMove = useCallback(
     (e: React.PointerEvent) => {
-      if (!drag.current.active) return;
+      if (!drag.current.active || !e.isPrimary) return;
       const dx = e.clientX - drag.current.startX;
       if (Math.abs(dx) > 4) drag.current.moved = true;
+
+      /*
+       * 直近の速度を指数移動平均で保持（末端の1フレームだけだとブレる）。
+       * dt が極端に短いサンプルは捨てる。pointerdown 直後の1発目は経過時間が
+       * ほぼ0になり、わずかな移動でも速度が無限大に近い値へ飛んで、
+       * ゆっくり動かしただけでフリックと誤判定される。
+       */
+      const dt = e.timeStamp - drag.current.lastT;
+      if (dt >= 8) {
+        const raw = (e.clientX - drag.current.lastX) / dt;
+        const v = Math.max(-2.5, Math.min(2.5, raw));
+        drag.current.vx = drag.current.vx * 0.6 + v * 0.4;
+        drag.current.lastX = e.clientX;
+        drag.current.lastT = e.timeStamp;
+      }
+
       const next = drag.current.startProgress - dx / step;
       // 端では引っ張り抵抗（軽いラバーバンド）
       const soft =
@@ -103,7 +140,19 @@ export default function Works() {
     if (!drag.current.active) return;
     drag.current.active = false;
     setDragging(false);
-    setProgress((p) => clamp(Math.round(p)));
+
+    const vx = drag.current.vx;
+    setProgress((p) => {
+      /*
+       * 勢いよく払った時は、移動距離が半分に届いていなくても隣へ送る。
+       * 指を左へ（vx が負）＝次のカード。floor+1 / ceil-1 にすることで、
+       * ちょうど整数位置から払った場合でも必ず1枚動く。
+       */
+      if (Math.abs(vx) > FLICK) {
+        return clamp(vx < 0 ? Math.floor(p) + 1 : Math.ceil(p) - 1);
+      }
+      return clamp(Math.round(p));
+    });
   }, []);
 
   const go = (i: number) => setProgress(clamp(i));
@@ -126,7 +175,11 @@ export default function Works() {
         onPointerMove={onPointerMove}
         onPointerUp={endDrag}
         onPointerCancel={endDrag}
-        onPointerLeave={endDrag}
+        /*
+         * onPointerLeave は付けない。ステージに捕捉を取っているので指が枠外へ
+         * 出ても pointerup は届く。付けると、斜めに払って指が上下にはみ出した
+         * 瞬間にドラッグが中断され、カードが途中で引き返す。
+         */
         role="group"
         aria-label="プロジェクト一覧（ドラッグまたはクリックで切り替え）"
       >
