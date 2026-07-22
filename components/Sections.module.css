@@ -1,0 +1,648 @@
+/* ============ About（右=画像 / 左=紹介文→History→Vital Sign） ============ */
+.aboutGrid {
+  display: grid;
+  gap: 40px;
+}
+
+/* 右：ポートレート */
+.aboutMedia {
+  margin: 0;
+}
+.aboutMedia img {
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  object-fit: cover;
+  border-radius: var(--radius);
+  border: 1px solid var(--glass-border);
+  filter: saturate(0.94);
+}
+
+/* 左：本文 */
+.intro {
+  font-family: var(--font-serif), serif;
+}
+/* リード見出し */
+.introTitleEn {
+  font-family: var(--font-display), sans-serif;
+  font-size: 0.72rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--accent-ink);
+  margin-bottom: 14px;
+}
+.introTitle {
+  font-family: var(--font-serif), serif;
+  font-weight: 700;
+  font-size: clamp(1.4rem, 2.5vw, 1.75rem);
+  line-height: 1.5;
+  letter-spacing: 0;
+  color: var(--text);
+  margin-bottom: 28px;
+}
+/* PCは1行、モバイルのみ改行 */
+.brMobile {
+  display: none;
+}
+@media (min-width: 641px) {
+  .introTitle {
+    white-space: nowrap;
+  }
+}
+@media (max-width: 640px) {
+  .brMobile {
+    display: inline;
+  }
+}
+.intro .lead {
+  font-size: 1.08rem;
+  font-weight: 500;
+  color: var(--text);
+}
+.intro p {
+  font-weight: 400;
+  color: var(--text);
+  letter-spacing: 0.01em;
+}
+.intro p + p {
+  margin-top: 1.25em;
+}
+.drop {
+  float: left;
+  font-family: var(--font-serif), serif;
+  font-weight: 700;
+  font-size: 3.4rem;
+  line-height: 0.86;
+  margin: 4px 14px 0 0;
+  color: var(--accent-ink);
+}
+
+.nameRow {
+  margin-top: 40px;
+  padding-top: 28px;
+  border-top: 1px solid var(--line);
+}
+.profileName {
+  font-family: var(--font-serif), serif;
+  font-weight: 700;
+  font-style: italic;
+  font-size: 1.7rem;
+  letter-spacing: -0.01em;
+  line-height: 1.1;
+  margin-bottom: 6px;
+}
+.profileNameEn {
+  font-size: 0.72rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--text-sub);
+}
+
+/* 左のブロック（History / Vital 共通） */
+.aboutBlock {
+  margin-top: 40px;
+}
+.blockLabel {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  font-family: var(--font-display), sans-serif;
+  font-size: 0.72rem;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--accent-ink);
+  margin-bottom: 20px;
+}
+.blockLabel::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--line);
+}
+
+/* History（縦軸タイムライン：コンテンツは線の右側） */
+.miniTimeline {
+  list-style: none;
+  position: relative;
+  margin: 4px 0 0;
+  padding-left: 34px;
+  display: grid;
+  gap: 0;
+}
+/* 縦の軸（左端に配置、上下はフェード） */
+.miniTimeline::before {
+  content: "";
+  position: absolute;
+  left: 6px;
+  top: 14px;
+  bottom: 18px;
+  width: 1px;
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    var(--accent) 10%,
+    var(--accent) 90%,
+    transparent
+  );
+  opacity: 0.35;
+}
+/* モバイルは年号を上に積む。横幅が狭く、2カラムだと本文が潰れるため */
+.miniTimeline li {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
+  padding: 26px 0;
+  transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+}
+/* ノード（線の左側に配置）。繊細に見せるため小さく・細く */
+.miniTimeline li::before {
+  content: "";
+  position: absolute;
+  left: -32px;
+  top: 32px;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--bg);
+  border: 1.5px solid var(--accent);
+  box-shadow: 0 0 0 0 var(--accent-dim);
+  transition: background 0.4s ease, box-shadow 0.4s ease, transform 0.4s ease;
+}
+.miniTimeline li:hover {
+  transform: translateX(4px);
+}
+.miniTimeline li:hover::before {
+  background: var(--accent);
+  box-shadow: 0 0 0 5px var(--accent-dim);
+}
+.miniYear {
+  font-family: var(--font-display), sans-serif;
+  font-weight: 700;
+  font-size: 1.7rem;
+  line-height: 1;
+  letter-spacing: 0.01em;
+  font-variant-numeric: tabular-nums;
+  color: var(--accent-ink);
+  transition: opacity 0.4s ease;
+}
+.miniTimeline li:hover .miniYear {
+  opacity: 0.85;
+}
+.miniBody {
+  min-width: 0;
+}
+.miniTitle {
+  font-family: var(--font-noto), sans-serif;
+  font-weight: 700;
+  font-size: 1.12rem;
+  line-height: 1.55;
+  letter-spacing: 0.01em;
+  color: var(--text);
+  margin-bottom: 10px;
+}
+/* About Me のリード文（.intro .lead）と同じ組みに揃える */
+.miniDesc {
+  font-family: var(--font-serif), serif;
+  font-size: 1.08rem;
+  font-weight: 500;
+  line-height: 2;
+  letter-spacing: 0.01em;
+  color: var(--text);
+}
+
+/* デスクトップは年号を左カラムに置き、本文と並べる */
+@media (min-width: 768px) {
+  .miniTimeline li {
+    grid-template-columns: 88px 1fr;
+    gap: 28px;
+    padding: 30px 0;
+  }
+  .miniTimeline li::before {
+    top: 36px;
+  }
+}
+
+/* Vital Sign（キー：値 の行） */
+.vital {
+  display: grid;
+  gap: 0;
+}
+.vitalRow {
+  display: grid;
+  grid-template-columns: 92px 1fr;
+  gap: 20px;
+  padding: 16px 0;
+  border-bottom: 1px solid var(--line);
+}
+.vitalRow:first-child {
+  padding-top: 0;
+}
+.vitalRow:last-child {
+  border-bottom: none;
+}
+.vitalKey {
+  font-size: 0.78rem;
+  letter-spacing: 0.14em;
+  color: var(--text-sub);
+  padding-top: 2px;
+}
+.vitalVal {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.vitalMain {
+  font-weight: 500;
+  font-size: 1rem;
+  color: var(--text);
+}
+.vitalSub {
+  font-size: 0.82rem;
+  color: var(--text-sub);
+}
+
+@media (min-width: 900px) {
+  .aboutGrid {
+    grid-template-columns: 1fr 400px;
+    gap: 72px;
+    align-items: start;
+  }
+  /* 右画像を先頭DOMだが右カラムへ。スクロール追従 */
+  .aboutMedia {
+    grid-column: 2;
+    grid-row: 1;
+    position: sticky;
+    top: 108px;
+  }
+  .aboutMain {
+    grid-column: 1;
+    grid-row: 1;
+  }
+}
+
+/* ============ タイムライン（History / Process 共用） ============ */
+.timeline {
+  position: relative;
+  padding-left: 32px;
+  display: grid;
+  gap: 48px;
+}
+.timeline::before {
+  content: "";
+  position: absolute;
+  left: 5px;
+  top: 6px;
+  bottom: 6px;
+  width: 1px;
+  background: var(--line);
+}
+.tlItem {
+  position: relative;
+}
+.tlItem::before {
+  content: "";
+  position: absolute;
+  left: -31px;
+  top: 8px;
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  border: 1px solid var(--accent);
+  background: var(--bg);
+}
+.tlYear {
+  font-family: var(--font-display), sans-serif;
+  font-weight: 700;
+  font-size: 0.85rem;
+  letter-spacing: 0.2em;
+  color: var(--accent-ink);
+  margin-bottom: 6px;
+}
+.tlTitle {
+  font-weight: 500;
+  font-size: 1.05rem;
+  margin-bottom: 6px;
+}
+.tlBody {
+  font-size: 0.92rem;
+  color: var(--text-sub);
+}
+
+/* ============ Skills（What I Do：画像付きカード） ============ */
+.skillGrid {
+  display: grid;
+  gap: 22px;
+}
+.skillCard {
+  overflow: hidden;
+  padding: 0;
+  transition: border-color 0.4s ease, transform 0.4s ease;
+}
+.skillCard:hover {
+  border-color: var(--accent);
+  transform: translateY(-6px);
+}
+/* カード上部のビジュアル */
+.skillImg {
+  position: relative;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+}
+.skillImg img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.6s ease;
+}
+.skillCard:hover .skillImg img {
+  transform: scale(1.05);
+}
+.skillNo {
+  position: absolute;
+  top: 14px;
+  left: 16px;
+  font-family: var(--font-display), sans-serif;
+  font-size: 0.72rem;
+  letter-spacing: 0.3em;
+  color: #fff;
+  text-shadow: 0 1px 10px rgba(70, 50, 30, 0.5);
+}
+.skillCardBody {
+  padding: 26px 28px 30px;
+}
+.skillTitle {
+  font-family: var(--font-display), sans-serif;
+  font-weight: 700;
+  font-size: 1.25rem;
+  letter-spacing: 0.01em;
+  margin-bottom: 12px;
+}
+.skillBody {
+  font-size: 0.92rem;
+  color: var(--text-sub);
+}
+@media (min-width: 768px) {
+  .skillGrid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 28px;
+  }
+}
+
+/* ============ Stack（Skills & Tools） ============ */
+/*
+ * Skills & Tools は前後のセクションと同じ地色で、境目が消えて
+ * 繋がって見えていた。一段持ち上げた面色を敷いて帯として独立させる。
+ * 昼はアクセントを僅かに混ぜた暖色寄り、夜はアクセント（ミント）が
+ * 濁るので混ぜずに素の面色を使う。
+ */
+.stackSection {
+  --stack-bg: color-mix(in srgb, var(--accent) 10%, var(--bg));
+  background: var(--stack-bg);
+}
+:global([data-sky="night"]) .stackSection {
+  --stack-bg: var(--bg-elev);
+}
+
+/*
+ * アンパサンドだけ別書体。Playfair Display の & は装飾的な
+ * カリグラフィ体で、周囲のローマン体から浮くため。
+ * 既に読み込んでいる明朝の、素直な形の & に差し替える。
+ */
+.amp {
+  font-family: var(--font-serif), serif;
+  font-weight: 700;
+  font-size: 0.9em;
+  letter-spacing: 0;
+  padding-inline: 0.04em;
+}
+
+/*
+ * 見出し→リードの間隔。共通の .section-title は clamp(40px, 8vh, 80px) だが、
+ * このセクションだけ空きが目立つため詰める。他セクションには影響させない。
+ */
+.stackSection :global(.section-title) {
+  margin-bottom: clamp(18px, 3vh, 30px);
+}
+/* セクション導入文（見出し直下）。英文リードは廃止し、和文のみ。 */
+.stackLeadJa {
+  max-width: 44ch;
+  margin-top: -4px;
+  margin-bottom: clamp(32px, 5vw, 56px);
+  font-family: var(--font-serif), serif;
+  font-size: 0.98rem;
+  line-height: 2;
+  color: var(--text-sub);
+}
+
+.stackGrid {
+  display: grid;
+  gap: 20px;
+}
+/* reveal を受けるラッパー。グリッドの子として伸び、中のカードを満たす */
+.stackCardWrap {
+  display: flex;
+  min-width: 0;
+}
+
+/* カードは列内で高さを揃える（中身の量に依らず天地を統一） */
+.stackCard {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: clamp(28px, 3vw, 36px) clamp(24px, 2.6vw, 32px);
+  box-shadow: 0 2px 10px -6px rgba(20, 14, 6, 0.18);
+}
+/*
+ * ホバーの明度差は重ねたレイヤーの不透明度で出す。
+ * background-color / border-color を transition すると、
+ * data-sky 切替時にテーマ変数の反映がブロックされて旧色のまま固まるため。
+ */
+/* 明度を上げる方向は昼夜で必要量が違うため、テーマごとに持たせる */
+.stackCard {
+  --stack-hover: rgba(255, 255, 255, 0.38);
+}
+:global([data-sky="night"]) .stackCard {
+  --stack-hover: rgba(255, 255, 255, 0.06);
+}
+.stackCard::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  border-radius: inherit;
+  background: var(--stack-hover);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  pointer-events: none;
+}
+.stackCard:hover::before {
+  opacity: 1;
+}
+.stackHead,
+.stackList {
+  position: relative;
+  z-index: 1;
+}
+/*
+ * タイトルやキャプションが1行か2行かでヘッダーの背が変わり、3枚並べたときに
+ * 罫線とタグの開始位置がずれる。2行ぶんの高さを最低値として確保して揃える。
+ */
+.stackHead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  /* box-sizing:border-box のため padding も含めた値にする */
+  min-height: calc(1.15rem * 1.55 * 2 + 20px);
+  padding-bottom: 20px;
+  margin-bottom: 24px;
+  border-bottom: 1px solid var(--line);
+}
+.stackTitle {
+  font-family: var(--font-display), sans-serif;
+  font-weight: 700;
+  font-size: 1.15rem;
+  letter-spacing: 0.01em;
+  line-height: 1.4;
+}
+/*
+ * 右上キャプション。
+ * 48%だと「Build Digital Experiences」だけ2行に折り返し、1枚目のヘッダーだけ
+ * 背が高くなって罫線とタグが13.9pxずれていた。56%で3枚とも1行に収める。
+ * 文字色は --text-faint だとコントラスト1.99で読めなかったため --text-sub に上げる。
+ */
+.stackNote {
+  flex: 0 1 auto;
+  max-width: 56%;
+  font-family: var(--font-display), sans-serif;
+  font-size: 0.7rem;
+  font-weight: 400;
+  letter-spacing: 0.04em;
+  line-height: 1.5;
+  text-align: right;
+  color: var(--text-sub);
+}
+/* タグは上詰め。カードが伸びても余白が間延びしない */
+.stackList {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  align-content: flex-start;
+  flex: 1;
+  gap: 8px;
+}
+.stackList li {
+  font-family: var(--font-display), sans-serif;
+  font-size: 0.74rem;
+  letter-spacing: 0.04em;
+  line-height: 1;
+  color: var(--text-sub);
+  padding: 8px 14px;
+  border: 1px solid var(--glass-border);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--bg-elev) 55%, transparent);
+}
+
+@media (min-width: 900px) {
+  .stackGrid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+  }
+}
+
+/* ============ Contact ============ */
+.contact {
+  text-align: center;
+}
+/* 中央寄せ時はアイブロウ線を消して真に中央へ */
+.contact :global(.section-label) {
+  justify-content: center;
+}
+.contact :global(.section-label)::before {
+  display: none;
+}
+.contactLead {
+  font-size: clamp(1.2rem, 4.5vw, 1.8rem);
+  font-weight: 400;
+  margin-bottom: 40px;
+  letter-spacing: 0.04em;
+}
+.contactBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  font-family: var(--font-display), sans-serif;
+  font-size: 0.85rem;
+  letter-spacing: 0.24em;
+  padding: 20px 48px;
+  border-radius: 999px;
+  border: 1px solid var(--accent);
+  color: var(--accent-ink);
+  transition: background 0.4s ease, color 0.4s ease;
+}
+.contactBtn:hover {
+  background: var(--accent);
+  color: #0a0a0c;
+}
+
+/* ============ Footer ============ */
+.footer {
+  border-top: 1px solid var(--line);
+  padding: 64px 0 40px;
+}
+.footerInner {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  align-items: center;
+  text-align: center;
+}
+.footerNav {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 24px;
+  font-family: var(--font-display), sans-serif;
+  font-size: 0.72rem;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+}
+.footerNav a {
+  color: var(--text-sub);
+  transition: color 0.3s ease;
+}
+.footerNav a:hover {
+  color: var(--accent-ink);
+}
+.footerSns {
+  display: flex;
+  gap: 16px;
+}
+.footerSns a {
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--glass-border);
+  border-radius: 50%;
+  color: var(--text-sub);
+  transition: border-color 0.3s ease, color 0.3s ease;
+}
+.footerSns a:hover {
+  border-color: var(--accent);
+  color: var(--accent-ink);
+}
+/* 絵文字グリフからSVGに変えたので、丸ボタン内での実寸を指定する */
+.footerSns a svg {
+  width: 19px;
+  height: 19px;
+  display: block;
+}
+/* --text-faint ではコントラストが基準に届かないため一段濃くする */
+.copyright {
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  color: var(--text-sub);
+}

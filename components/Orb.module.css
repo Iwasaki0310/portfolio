@@ -1,0 +1,56 @@
+/* 空に浮かぶ天体（配置・サイズは親コンテナ側で指定） */
+.orb {
+  position: absolute;
+  inset: -30%;
+  pointer-events: none;
+}
+
+/* 太陽・月の共通ベース。呼吸は scale のみ（opacity は昼夜で制御） */
+.sun,
+.moon {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  transition: opacity 0.9s ease;
+  animation: orbBreath 6s ease-in-out infinite;
+}
+@keyframes orbBreath {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.02);
+  }
+}
+
+/* 太陽の光条をゆっくり回転させる（呼吸とは別レイヤーで分離） */
+.sunSpin {
+  position: absolute;
+  inset: 0;
+  opacity: 0.72;
+  /* 彩度を落として空に馴染ませる（オレンジの主張を抑える） */
+  filter: saturate(0.62) brightness(1.04);
+  animation: sunSpin 220s linear infinite;
+  will-change: transform;
+}
+@keyframes sunSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* 既定（昼）：太陽を表示、月は非表示 */
+.moon {
+  opacity: 0;
+}
+
+/* 夜：月を表示、太陽を隠す */
+:global([data-sky="night"]) .sun {
+  opacity: 0;
+}
+:global([data-sky="night"]) .moon {
+  opacity: 1;
+}

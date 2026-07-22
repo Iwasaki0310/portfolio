@@ -1,0 +1,194 @@
+/* ============ How I Work（私の仕事の流儀） ============ */
+.head {
+  margin-bottom: clamp(40px, 7vh, 80px);
+}
+
+.eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  font-family: var(--font-display), sans-serif;
+  font-size: 0.72rem;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--text-sub);
+  margin-bottom: 24px;
+}
+.eyebrowNo {
+  color: var(--accent-ink);
+}
+.eyebrow::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--line);
+}
+
+/* 大見出し（和文ゴシック） */
+/* 英語見出しになったので、他セクションの .section-title と同じ組みに揃える */
+.title {
+  font-family: var(--font-title), var(--font-serif), serif;
+  font-weight: 700;
+  font-size: clamp(2.4rem, 7vw, 4.6rem);
+  line-height: 1.06;
+  letter-spacing: -0.02em;
+  color: var(--text);
+}
+
+/* ---------- タイトル下の横長ビジュアル ---------- */
+.hero {
+  position: relative;
+  margin: 0 0 clamp(48px, 7vh, 88px);
+  border-radius: var(--radius);
+  overflow: hidden;
+  border: 1px solid var(--glass-border);
+  transition: box-shadow 0.55s ease, transform 0.55s ease;
+}
+/* フォーカスリングを消さない。星座演出だけでは「今ここにいる」が伝わらない */
+.hero:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+.hero img {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.7s ease, filter 0.6s ease;
+}
+
+/* 起動：暖色のシャドウ＋わずかに持ち上げ、画像を少し明るく */
+.hero:hover,
+.hero:focus-visible,
+.hero.revealed {
+  box-shadow: 0 34px 80px -26px rgba(150, 105, 60, 0.55),
+    0 0 0 1px rgba(214, 178, 122, 0.35);
+}
+.hero:hover,
+.hero:focus-visible {
+  transform: translateY(-4px);
+}
+.hero:hover img,
+.hero:focus-visible img,
+.hero.revealed img {
+  transform: scale(1.03);
+  filter: saturate(1.05) brightness(1.04);
+}
+
+/* ---------- 星座オーバーレイ ---------- */
+.constellation {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.6s ease;
+}
+.hero:hover .constellation,
+.hero:focus-visible .constellation,
+.hero.revealed .constellation {
+  opacity: 1;
+}
+
+/* 線：細く上品に、起動で描かれる */
+.constLines polyline {
+  fill: none;
+  stroke: rgba(248, 236, 214, 0.7);
+  stroke-width: 1;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  filter: drop-shadow(0 0 3px rgba(255, 216, 158, 0.7));
+  stroke-dasharray: 2600;
+  stroke-dashoffset: 2600;
+  transition: stroke-dashoffset 1.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.hero:hover .constLines polyline,
+.hero:focus-visible .constLines polyline,
+.hero.revealed .constLines polyline {
+  stroke-dashoffset: 0;
+}
+
+/* 主要ノード：4点スパークル。光って瞬き＋わずかに回転 */
+.constNodes path {
+  fill: #fffaf0;
+  filter: drop-shadow(0 0 6px rgba(255, 224, 176, 0.95))
+    drop-shadow(0 0 14px rgba(255, 200, 130, 0.5));
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: center;
+  transition: opacity 0.6s ease var(--d, 0s);
+}
+.hero:hover .constNodes path,
+.hero:focus-visible .constNodes path,
+.hero.revealed .constNodes path {
+  opacity: 1;
+  animation: sparkle 3.4s ease-in-out infinite;
+  animation-delay: var(--d, 0s);
+}
+
+/* 散り星：小さく硬質に瞬く */
+.constDust circle {
+  fill: rgba(255, 248, 232, 0.9);
+  filter: drop-shadow(0 0 2px rgba(255, 220, 168, 0.75));
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+.hero:hover .constDust circle,
+.hero:focus-visible .constDust circle,
+.hero.revealed .constDust circle {
+  opacity: 1;
+  animation: twinkle 3.2s ease-in-out infinite;
+  animation-delay: var(--d, 0s);
+}
+
+/* スパークル：明滅＋微回転＋わずかな拡縮で“きらり”と */
+@keyframes sparkle {
+  0%, 100% { opacity: 0.4; transform: rotate(0deg) scale(0.9); }
+  50% { opacity: 1; transform: rotate(18deg) scale(1.12); }
+}
+@keyframes twinkle {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .constLines polyline { transition: none; stroke-dashoffset: 0; }
+  .constNodes path,
+  .constDust circle { animation: none; }
+}
+
+/* リード（本文より大きく・印象的に） */
+.lead {
+  font-family: var(--font-serif), serif;
+  font-weight: 500;
+  font-size: clamp(1.3rem, 3vw, 2.5rem);
+  line-height: 1.65;
+  letter-spacing: 0.01em;
+  color: var(--text);
+  margin-bottom: clamp(36px, 5.5vh, 60px);
+}
+/* PCは1行固定 */
+@media (min-width: 641px) {
+  .lead {
+    white-space: nowrap;
+  }
+}
+
+/* 本文段落 */
+.para {
+  font-family: var(--font-serif), serif;
+  font-size: 1.02rem;
+  line-height: 2.1;
+  color: var(--text);
+}
+.para + .para {
+  margin-top: 1.8em;
+}
+/* PCは1行固定（幅に応じて自動縮小） */
+@media (min-width: 641px) {
+  .paraNowrap {
+    white-space: nowrap;
+    font-size: clamp(0.94rem, 1.35vw, 1.02rem);
+  }
+}

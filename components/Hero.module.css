@@ -1,0 +1,523 @@
+/* ============ 幻想ヒーロー（空＋正面人物＋浮遊球体） ============ */
+.hero {
+  position: relative;
+  padding: 0;
+}
+
+.pin {
+  position: relative;
+  height: 100vh;
+  height: 100svh;
+  overflow: hidden;
+  background: var(--bg);
+}
+
+/* ズームするシーン（球体を中心に奥へ寄る） */
+.scene {
+  position: absolute;
+  inset: 0;
+  transform-origin: 82% 47%;
+  will-change: transform;
+  z-index: 1;
+  /* mix-blend-mode の雲・星を scene 内に閉じ込め、背景を巻き込む矩形化を防ぐ */
+  isolation: isolate;
+}
+
+/* 空＋雲の統合背景（少し大きめに置いてパララックスでも端が出ないように） */
+.sky,
+.skyNight {
+  position: absolute;
+  top: -8%;
+  left: -4%;
+  width: 108%;
+  max-width: none; /* グローバルの img{max-width:100%} を解除（右の隙間対策） */
+  height: 116%;
+  object-fit: cover;
+  object-position: 50% 45%;
+  will-change: transform;
+}
+/* 夜空は既定で非表示、data-sky=night でクロスフェード */
+.skyNight {
+  opacity: 0;
+  transition: opacity 0.9s ease;
+}
+:global([data-sky="night"]) .skyNight {
+  opacity: 1;
+}
+
+/* 雲レイヤー共通（全面カバーで端は透過＝見切れなし。transformはGSAP管理） */
+.cloudWispA,
+.cloudLeft,
+.cloudRight,
+.cloudBottom {
+  position: absolute;
+  max-width: none;
+  object-fit: cover;
+  pointer-events: none;
+  will-change: transform;
+  transition: opacity 0.9s ease;
+}
+
+/* 奥：薄い巻雲（上部にワイドに）。ゆっくり動く */
+.cloudWispA {
+  top: -8%;
+  left: -6%;
+  width: 112%;
+  height: 90%;
+  object-position: 50% 6%;
+  z-index: 1;
+  opacity: 0.6;
+}
+
+/* 左の雲（KV左側・人物の前面。人物には掛からないので上まで大きく） */
+.cloudLeft {
+  bottom: -5%;
+  left: -14%;
+  width: 82%;
+  height: 88%;
+  object-position: 0% 100%;
+  z-index: 6;
+  opacity: 0.74;
+  /* 存在感を抑えて空に馴染ませる（明るく・彩度↓・コントラスト↓。形は保持） */
+  filter: brightness(1.14) saturate(0.74) contrast(0.8);
+}
+
+/* 右の雲（KV右側・人物の前面。右へ寄せて上部も見せる） */
+.cloudRight {
+  bottom: -6%;
+  right: -16%;
+  width: 58%;
+  height: 95%;
+  object-position: 70% 100%;
+  z-index: 3;
+  opacity: 0.95;
+  -webkit-mask: linear-gradient(to right, transparent 0%, #000 16%);
+  mask: linear-gradient(to right, transparent 0%, #000 16%);
+}
+
+/* 前景の雲海（全幅・足元だけ薄く包む＝胴体は透けて見える） */
+.cloudFront {
+  position: absolute;
+  left: -10%;
+  bottom: -6%;
+  width: 120%;
+  max-width: none;
+  height: 30%;
+  object-fit: cover;
+  object-position: center bottom;
+  z-index: 6;
+  opacity: 0.78;
+  pointer-events: none;
+  will-change: transform;
+  transition: opacity 0.9s ease;
+  -webkit-mask: linear-gradient(to top, #000 38%, transparent 82%);
+  mask: linear-gradient(to top, #000 38%, transparent 82%);
+}
+:global([data-sky="night"]) .cloudFront {
+  opacity: 0.2;
+}
+
+/* 前景：足元を包む立体的な積雲（人物の前） */
+.cloudBottom {
+  bottom: -6%;
+  left: -12%;
+  width: 130%;
+  height: 118%;
+  object-position: 60% 100%;
+  z-index: 6;
+  opacity: 1;
+}
+
+:global([data-sky="night"]) .cloudWispA {
+  opacity: 0.14;
+}
+:global([data-sky="night"]) .cloudLeft,
+:global([data-sky="night"]) .cloudRight {
+  opacity: 0.16;
+}
+:global([data-sky="night"]) .cloudBottom {
+  opacity: 0.2;
+}
+
+/* 人物（正面向き切り抜き）。GSAPは.sceneを拡大するので、ここのtransformは自由 */
+.person {
+  position: absolute;
+  bottom: -3vh;
+  left: 42%;
+  transform: translateX(-50%);
+  width: min(150vw, 620px);
+  max-width: none;
+  filter: drop-shadow(var(--person-shadow));
+  z-index: 4;
+  /* 下端の直線を雲に溶け込ませる */
+  -webkit-mask: linear-gradient(to top, transparent 0%, #000 14%);
+  mask: linear-gradient(to top, transparent 0%, #000 14%);
+}
+
+/* 浮遊する球体 */
+.heroOrb {
+  position: absolute;
+  left: 82%;
+  top: 36%;
+  width: 34%;
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%);
+  z-index: 5;
+  animation: orbFloat 6s ease-in-out infinite;
+}
+@keyframes orbFloat {
+  0%,
+  100% {
+    transform: translate(-50%, -50%);
+  }
+  50% {
+    transform: translate(-50%, calc(-50% - 14px));
+  }
+}
+
+
+/* 星：screen合成で光の点だけを足す（常時表示・空の上に、雲の下に） */
+.stars {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  opacity: 1;
+  mix-blend-mode: screen;
+  background:
+    radial-gradient(circle at 15% 22%, rgba(255, 255, 255, 0.95), transparent 1.5px),
+    radial-gradient(circle at 32% 12%, rgba(210, 226, 255, 0.85), transparent 1.4px),
+    radial-gradient(circle at 48% 30%, rgba(255, 255, 255, 0.75), transparent 1.2px),
+    radial-gradient(circle at 68% 16%, rgba(210, 226, 255, 0.9), transparent 1.6px),
+    radial-gradient(circle at 82% 34%, rgba(255, 255, 255, 0.8), transparent 1.3px),
+    radial-gradient(circle at 24% 46%, rgba(210, 226, 255, 0.75), transparent 1.2px),
+    radial-gradient(circle at 90% 9%, rgba(255, 255, 255, 0.85), transparent 1.4px),
+    radial-gradient(circle at 55% 7%, rgba(210, 226, 255, 0.75), transparent 1.2px),
+    radial-gradient(circle at 40% 52%, rgba(255, 255, 255, 0.6), transparent 1px),
+    radial-gradient(circle at 74% 48%, rgba(255, 255, 255, 0.55), transparent 1px),
+    /* --- 追加：幻想的にするための星を増量 --- */
+    radial-gradient(circle at 8% 38%, rgba(255, 255, 255, 0.8), transparent 1.3px),
+    radial-gradient(circle at 20% 8%, rgba(255, 255, 255, 0.7), transparent 1.1px),
+    radial-gradient(circle at 38% 40%, rgba(210, 226, 255, 0.7), transparent 1.1px),
+    radial-gradient(circle at 62% 26%, rgba(255, 255, 255, 0.65), transparent 1px),
+    radial-gradient(circle at 60% 42%, rgba(255, 255, 255, 0.6), transparent 1px),
+    radial-gradient(circle at 78% 20%, rgba(210, 226, 255, 0.8), transparent 1.2px),
+    radial-gradient(circle at 88% 26%, rgba(255, 255, 255, 0.7), transparent 1.1px),
+    radial-gradient(circle at 95% 40%, rgba(255, 255, 255, 0.65), transparent 1px),
+    radial-gradient(circle at 5% 14%, rgba(210, 226, 255, 0.75), transparent 1.2px),
+    radial-gradient(circle at 45% 16%, rgba(255, 255, 255, 0.7), transparent 1px),
+    radial-gradient(circle at 30% 28%, rgba(255, 255, 255, 0.55), transparent 0.9px),
+    radial-gradient(circle at 66% 6%, rgba(255, 255, 255, 0.7), transparent 1.1px),
+    radial-gradient(circle at 12% 52%, rgba(255, 255, 255, 0.5), transparent 0.9px),
+    radial-gradient(circle at 52% 34%, rgba(210, 226, 255, 0.6), transparent 1px),
+    radial-gradient(circle at 85% 48%, rgba(255, 255, 255, 0.5), transparent 0.9px),
+    radial-gradient(circle at 70% 36%, rgba(255, 255, 255, 0.55), transparent 0.9px);
+}
+
+/* 星座（線で結ばれた星）。空の上に、雲の下に */
+.constellation {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0.9;
+}
+.constellation polyline {
+  fill: none;
+  stroke: rgba(255, 240, 214, 0.55);
+  stroke-width: 1;
+}
+.constellation circle {
+  fill: #fff;
+}
+.constellation circle:nth-of-type(even) {
+  fill: #ffe6b8;
+}
+.tw {
+  animation: twinkle 3.8s ease-in-out infinite;
+}
+@keyframes twinkle {
+  0%,
+  100% {
+    opacity: 0.12;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+/* 夜は星をくっきり */
+:global([data-sky="night"]) .constellation {
+  opacity: 1;
+}
+
+/* 浮遊する光の粒 */
+.particles {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+}
+.particles span {
+  position: absolute;
+  top: calc(8% + (var(--i) * 8%));
+  left: calc(6% + (var(--i) * 8.5%) - (var(--i) * var(--i) * 0.3%));
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: rgba(255, 244, 220, 0.9);
+  box-shadow: 0 0 8px rgba(255, 236, 196, 0.8);
+  opacity: 0;
+  animation: float 7s ease-in-out infinite;
+  animation-delay: calc(var(--i) * -0.7s);
+}
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0) scale(0.7);
+    opacity: 0;
+  }
+  30%,
+  70% {
+    opacity: 0.9;
+  }
+  50% {
+    transform: translateY(-26px) scale(1);
+  }
+}
+
+/* 太陽ズーム用ラッパー（orbFloatと分離してGSAPがscaleを持つ） */
+.orbZoom {
+  position: absolute;
+  inset: 0;
+  will-change: transform;
+}
+
+/* ---------- 巨大タイトル＋肩書き ---------- */
+.titleBlock {
+  position: absolute;
+  z-index: 6;
+  top: 50%;
+  transform: translateY(-50%);
+  left: clamp(24px, 8vw, 80px);
+  pointer-events: none;
+}
+.name {
+  font-family: var(--font-display), sans-serif;
+  font-weight: 700;
+  font-size: clamp(3.4rem, 15vw, 8rem);
+  line-height: 0.94;
+  letter-spacing: -0.045em;
+  color: var(--hero-type);
+  text-shadow: 0 2px 30px rgba(236, 229, 215, 0.4);
+}
+.subtitle {
+  margin-top: 20px;
+  margin-left: 6px;
+  font-family: var(--font-display), sans-serif;
+  font-size: clamp(0.95rem, 2.8vw, 1.25rem);
+  font-weight: 700;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--accent-ink);
+}
+
+/* ---------- 本文 + 数値 + CTA ---------- */
+.copy {
+  position: absolute;
+  z-index: 6;
+  left: 16px;
+  right: 16px;
+  bottom: 16px;
+  padding: 22px 22px 24px;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+.role {
+  font-family: var(--font-display), sans-serif;
+  font-size: 0.72rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--accent-ink);
+  margin-bottom: 10px;
+}
+.catch {
+  font-size: clamp(1.1rem, 4vw, 1.6rem);
+  font-weight: 400;
+  letter-spacing: 0.04em;
+  margin-bottom: 22px;
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  list-style: none;
+  padding-top: 20px;
+  margin-bottom: 22px;
+  border-top: 1px solid var(--line);
+}
+.stats li {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.statNum {
+  font-family: var(--font-display), sans-serif;
+  font-weight: 700;
+  font-size: clamp(1.3rem, 6vw, 1.7rem);
+  color: var(--text);
+}
+.statLabel {
+  font-size: 0.62rem;
+  line-height: 1.4;
+  color: var(--text-sub);
+}
+
+.cta {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  font-family: var(--font-display), sans-serif;
+  font-size: 0.8rem;
+  letter-spacing: 0.24em;
+  padding: 16px 26px;
+  border: 1px solid var(--glass-border);
+  border-radius: 999px;
+  background: var(--accent);
+  color: #fff;
+  transition: opacity 0.4s ease;
+}
+.cta:hover {
+  opacity: 0.88;
+}
+.ctaArrow {
+  color: currentColor;
+  transition: transform 0.4s ease;
+}
+.cta:hover .ctaArrow {
+  transform: translateY(4px);
+}
+
+.scrollHint {
+  position: absolute;
+  z-index: 6;
+  right: 20px;
+  bottom: 24px;
+  font-family: var(--font-display), sans-serif;
+  font-size: 0.62rem;
+  letter-spacing: 0.4em;
+  color: var(--text-faint);
+  writing-mode: vertical-rl;
+}
+
+/* ============ タブレット以上 ============ */
+@media (min-width: 768px) {
+  .stats {
+    display: none;
+  }
+  .cta {
+    display: inline-flex;
+    width: auto;
+    background: var(--glass-bg);
+    color: var(--text);
+  }
+  .cta:hover {
+    opacity: 1;
+    border-color: var(--accent);
+    background: var(--accent-dim);
+  }
+  .ctaArrow {
+    color: var(--accent-ink);
+  }
+}
+
+/* ============ モバイル（SP）専用：崩れ対策 ============ */
+@media (max-width: 899px) {
+  /* タイトルは上部に（人物と重ならないように） */
+  .titleBlock {
+    top: clamp(96px, 14vh, 170px);
+    transform: none;
+    left: 24px;
+  }
+  /* 人物は中央・大きめ・少し上へ */
+  .person {
+    left: 50%;
+    bottom: 11vh;
+    width: min(140vw, 540px);
+  }
+  /* 左の雲：モバイルでは左下に配置（PCと同じ素材） */
+  .cloudLeft {
+    display: block;
+    left: -40%;
+    bottom: 0;
+    /* 切り抜き（cover）せず画像全体を表示。下端は画面下に付けたまま
+       大きくして雲を上まで見せる（隙間なく上げる）。左はみ出しOK */
+    width: 180%;
+    height: auto;
+    object-fit: fill;
+    z-index: 6;
+    opacity: 0.72;
+    filter: brightness(1.14) saturate(0.74) contrast(0.8);
+  }
+  /* 右の雲：モバイルでも右下に配置（PCと同じ左右構成に） */
+  .cloudRight {
+    display: block;
+    right: -38%;
+    left: auto;
+    bottom: -4%;
+    width: 88%;
+    height: 46%;
+    object-position: 100% 100%;
+    z-index: 6;
+    opacity: 0.82;
+  }
+  /* 前景の雲海はSPでは使わない（SPは全体表示の左右雲の構成） */
+  .cloudFront {
+    display: none;
+  }
+  .cloudWispA {
+    opacity: 0.45;
+  }
+}
+
+/* ============ デスクトップ：本文を左に、人物は右・控えめサイズ ============ */
+@media (min-width: 900px) {
+  .scene {
+    transform-origin: 83% 26%;
+  }
+  /* 人物は中央やや右 */
+  .person {
+    bottom: 0;
+    left: 66%;
+    right: auto;
+    transform: translateX(-50%);
+    width: min(56vw, 740px);
+  }
+  /* 球は人物の右上 */
+  .heroOrb {
+    left: 83%;
+    top: 26%;
+    width: 12%;
+  }
+  .titleBlock {
+    top: 50%;
+    transform: translateY(-50%);
+    left: clamp(120px, 15vw, 320px);
+  }
+  .name {
+    font-size: clamp(4.5rem, 8vw, 8.5rem);
+  }
+  .subtitle {
+    margin-top: 28px;
+    font-size: clamp(1.1rem, 1.6vw, 1.45rem);
+  }
+  .scrollHint {
+    right: clamp(40px, 4vw, 72px);
+  }
+}

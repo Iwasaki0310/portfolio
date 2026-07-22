@@ -1,0 +1,170 @@
+/* ============================================
+   Ren Iwasaki Portfolio — Design Tokens
+   デフォルトは明るい昼テーマ。data-sky="night" でダークに切替
+   ============================================ */
+:root {
+  /* base — 温かみのあるクリーム/アイボリー */
+  --bg: #ece5d7;
+  --bg-elev: #f4efe3;
+
+  /* sky */
+  --sky-top: #86b9e6;
+  --sky-bottom: #dbe8f4;
+
+  /* text — 暖色寄りのダークブラウン */
+  --text: rgba(44, 36, 27, 0.92);
+  --text-sub: rgba(44, 36, 27, 0.74);
+  --text-faint: rgba(44, 36, 27, 0.56);
+
+  /* accent — テラコッタ/タン（1色のみ） */
+  --accent: #b17c4d;
+  --accent-dim: rgba(177, 124, 77, 0.12);
+  /*
+   * 文字用のアクセント。--accent は地色に対して 2.86:1 しか出ず、
+   * 文字に使うと基準を満たさない。面（背景・枠・ドット）には --accent を、
+   * 文字には --accent-ink を使い分ける。色相は同じで暗度だけ落としてある。
+   */
+  --accent-ink: #7d5330;
+
+  /* surface / glass */
+  --glass-bg: rgba(255, 252, 245, 0.5);
+  --glass-border: rgba(44, 36, 27, 0.12);
+  --line: rgba(44, 36, 27, 0.12);
+
+  /* hero: 空から次セクションへ溶けるフェード色 */
+  --hero-fade-soft: rgba(236, 229, 215, 0.35);
+  /* hero: 巨大タイポの色（昼は雲に沈まないダーク） */
+  --hero-type: rgba(38, 30, 21, 0.92);
+  /* hero: 人物の影（昼は淡く。黒い滲みにしない） */
+  --person-shadow: 0 14px 36px rgba(40, 30, 18, 0.1);
+
+  --radius: 20px;
+  --section-pad: clamp(84px, 11vh, 140px);
+}
+
+[data-sky="night"] {
+  --bg: #0a0a0c;
+  --bg-elev: #101014;
+  --sky-top: #101522;
+  --sky-bottom: #1b2a3a;
+  --text: rgba(240, 244, 248, 0.92);
+  --text-sub: rgba(240, 244, 248, 0.72);
+  --text-faint: rgba(240, 244, 248, 0.55);
+  --accent: #7ff5d4;
+  --accent-dim: rgba(127, 245, 212, 0.14);
+  /* 夜は暗い地色なので、ミントのまま十分なコントラストが出る */
+  --accent-ink: #7ff5d4;
+  --glass-bg: rgba(255, 255, 255, 0.05);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --line: rgba(255, 255, 255, 0.08);
+  --hero-fade-soft: rgba(10, 10, 12, 0.4);
+  --hero-type: rgba(240, 244, 248, 0.96);
+  --person-shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--bg);
+  color: var(--text);
+  font-family: var(--font-noto), "Noto Sans JP", sans-serif;
+  font-weight: 300;
+  line-height: 1.8;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  transition: background-color 0.8s ease, color 0.8s ease;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+::selection {
+  background: var(--accent);
+  color: #ffffff;
+}
+
+/* ---------- 共通レイアウト ---------- */
+.container {
+  width: min(100% - 48px, 1120px);
+  margin-inline: auto;
+}
+
+section {
+  padding-block: var(--section-pad);
+}
+
+/*
+ * アンカー遷移でヘッダー（position:fixed / 約91px）に見出しが潜るのを防ぐ。
+ * 対象は id を持つジャンプ先すべて。
+ */
+:where(section, [id="history"])[id] {
+  scroll-margin-top: 110px;
+}
+
+/* セクション見出し */
+.section-label {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  font-family: var(--font-display), sans-serif;
+  font-size: 0.78rem;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: var(--accent-ink);
+  margin-bottom: 18px;
+}
+.section-label::before {
+  content: "";
+  width: 32px;
+  height: 1px;
+  background: var(--accent);
+  opacity: 0.6;
+}
+.section-no {
+  color: var(--accent-ink);
+  opacity: 0.7;
+  font-variant-numeric: tabular-nums;
+}
+
+/*
+ * エディトリアルセリフ。和字グリフを持たないため、
+ * 日本語見出しが来た場合は明朝（--font-serif）に落とす。
+ */
+.section-title {
+  font-family: var(--font-title), var(--font-serif), serif;
+  font-weight: 700;
+  font-size: clamp(2.4rem, 7vw, 4.6rem);
+  line-height: 1.06;
+  letter-spacing: -0.02em;
+  margin-bottom: clamp(40px, 8vh, 80px);
+}
+
+/* グラスカード */
+.glass {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}

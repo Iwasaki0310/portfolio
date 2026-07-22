@@ -1,0 +1,220 @@
+.header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px clamp(20px, 4vw, 56px);
+  transition: background 0.4s ease, border-color 0.4s ease, backdrop-filter 0.4s ease;
+  border-bottom: 1px solid transparent;
+}
+/* 背景は常に透過（ユーザー指定）。スクロールしても不透明化しない */
+.solid {
+  background: transparent;
+  border-bottom-color: transparent;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+}
+.logoImg {
+  height: 50px;
+  width: auto;
+  object-fit: contain;
+  mix-blend-mode: multiply;
+  transition: opacity 0.3s ease;
+}
+
+:global([data-sky="night"]) .logoImg {
+  mix-blend-mode: screen;
+  filter: invert(1);
+}
+
+.nav {
+  display: none;
+  gap: clamp(20px, 2.4vw, 40px);
+}
+.link {
+  position: relative;
+  font-family: var(--font-display), sans-serif;
+  font-size: 0.72rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--text-sub);
+  padding: 4px 0;
+  transition: color 0.3s ease;
+}
+.link::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 1px;
+  background: var(--accent);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.35s ease;
+}
+.link:hover {
+  color: var(--text);
+}
+.link:hover::after {
+  transform: scaleX(1);
+}
+
+.navCta {
+  display: none;
+  font-family: var(--font-display), sans-serif;
+  font-size: 0.72rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--accent-ink);
+  padding: 10px 22px;
+  border: 1px solid var(--accent);
+  border-radius: 999px;
+  transition: background 0.3s ease, color 0.3s ease;
+}
+.navCta:hover {
+  background: var(--accent);
+  color: var(--bg-elev);
+}
+
+/* 右側のアクション群 */
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+/* 昼夜トグル */
+.skyToggle {
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  font-size: 1.05rem;
+  line-height: 1;
+  color: var(--text);
+  border: 1px solid var(--glass-border);
+  border-radius: 50%;
+  background: var(--glass-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  cursor: pointer;
+  transition: color 0.3s ease, border-color 0.3s ease, transform 0.3s ease;
+}
+.skyToggle:hover {
+  color: var(--accent-ink);
+  border-color: var(--accent);
+  transform: rotate(-18deg);
+}
+
+/* ---------- モバイル：バーガー ---------- */
+.burger {
+  position: relative;
+  width: 44px;
+  height: 44px;
+  border: 1px solid var(--glass-border);
+  border-radius: 50%;
+  background: var(--glass-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  cursor: pointer;
+}
+.burgerLine,
+.burgerLine::before,
+.burgerLine::after {
+  position: absolute;
+  left: 50%;
+  width: 18px;
+  height: 1.5px;
+  background: var(--text);
+  transform: translateX(-50%);
+  transition: transform 0.35s ease, opacity 0.2s ease;
+}
+.burgerLine {
+  top: 50%;
+  margin-top: -0.75px;
+}
+.burgerLine::before {
+  content: "";
+  top: -6px;
+}
+.burgerLine::after {
+  content: "";
+  top: 6px;
+}
+.burgerOpen {
+  background: transparent;
+}
+.burgerOpen::before {
+  top: 0;
+  transform: translateX(-50%) rotate(45deg);
+}
+.burgerOpen::after {
+  top: 0;
+  transform: translateX(-50%) rotate(-45deg);
+}
+
+.drawer {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  display: grid;
+  place-content: center;
+  background: color-mix(in srgb, var(--bg) 96%, transparent);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  opacity: 0;
+  pointer-events: none;
+  /*
+   * visibility も落とす。opacity:0 と pointer-events:none だけでは
+   * 中のリンクがタブ順に残り、画面に何も見えないままフォーカスが入る。
+   * visibility の遅延切り替えでフェードアウトは維持する。
+   */
+  visibility: hidden;
+  transition: opacity 0.4s ease, visibility 0s linear 0.4s;
+}
+.drawerOpen {
+  opacity: 1;
+  pointer-events: auto;
+  visibility: visible;
+  transition: opacity 0.4s ease, visibility 0s linear 0s;
+}
+.drawerNav {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 28px;
+}
+.drawerLink {
+  font-family: var(--font-display), sans-serif;
+  font-size: 1.6rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  color: var(--text);
+}
+
+@media (min-width: 900px) {
+  .nav,
+  .navCta {
+    display: flex;
+  }
+  .burger {
+    display: none;
+  }
+  /* 開く手段が無いので、中のリンクごと消す */
+  .drawer {
+    display: none;
+  }
+  .logoImg {
+    height: 125px;
+    margin-top: -40px;
+    margin-bottom: -40px;
+  }
+}
