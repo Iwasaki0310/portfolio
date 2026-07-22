@@ -1,7 +1,17 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import s from "./Header.module.css";
+
+/** ラベル中の「&」だけ明朝に落とす（Playfair の & は装飾が強く浮くため） */
+function withAmp(label: string) {
+  return label.split("&").map((part, i) => (
+    <Fragment key={i}>
+      {i > 0 && <span className={s.drawerAmp}>&amp;</span>}
+      {part}
+    </Fragment>
+  ));
+}
 
 // 番号付きセクション（01〜05）と1対1に対応させる。
 // History は Profile 内のブロックなのでナビからは外し、
@@ -75,7 +85,7 @@ export default function Header() {
         <nav className={s.drawerNav} aria-label="モバイルナビゲーション">
           {NAV.map(([label, href]) => (
             <a key={href} href={href} className={s.drawerLink}>
-              {label}
+              {withAmp(label)}
             </a>
           ))}
         </nav>

@@ -150,7 +150,12 @@ export default function Skills() {
             ease: "back.out(1.6)",
             scrollTrigger: {
               trigger: card,
-              start: "top 85%",
+              /*
+               * 旧値 85% だとカードが画面最下部に顔を出した瞬間にめくれ終わり、
+               * 演出が見えないまま通り過ぎていた。カードが十分に画面へ入って
+               * から回すよう、発火位置を上げる。
+               */
+              start: "top 70%",
               toggleActions: "play none none reverse",
             },
           });

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { useReveal } from "@/lib/useReveal";
 import s from "./Studies.module.css";
 
@@ -25,20 +25,11 @@ export default function Studies() {
   const [revealed, setRevealed] = useState(false);
   useReveal(root);
 
-  // モバイルはホバーが無いので、画面に入ったら星座を出す
-  useEffect(() => {
-    const fig = figRef.current;
-    if (!fig) return;
-    if (!window.matchMedia("(max-width: 899px)").matches) return;
-    const io = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((e) => setRevealed(e.isIntersecting));
-      },
-      { threshold: 0.35 }
-    );
-    io.observe(fig);
-    return () => io.disconnect();
-  }, []);
+  /*
+   * モバイルはホバーが無い。以前は画面に入った時点で自動的に星座を出していたが、
+   * 「スクロールしたら勝手に出ている」状態になり演出として成立しないため、
+   * タップで出す方式に変更した。PCは従来どおり CSS の :hover で出る。
+   */
 
   return (
     <section ref={root} id="studies">
@@ -54,14 +45,22 @@ export default function Studies() {
           </h2>
         </header>
 
-        {/* タイトル下：横長ビジュアル（ホバー/インビューで星座＋シャドウ） */}
+        {/* タイトル下：横長ビジュアル（PCはホバー／SPはタップで星座＋シャドウ） */}
         <figure
           ref={figRef}
           className={`${s.hero} ${revealed ? s.revealed : ""}`}
           data-reveal
           tabIndex={0}
-          role="img"
-          aria-label="星座が浮かび上がるビジュアル"
+          role="button"
+          aria-pressed={revealed}
+          aria-label={revealed ? "星座を隠す" : "タップして星座を表示"}
+          onClick={() => setRevealed((v) => !v)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              setRevealed((v) => !v);
+            }
+          }}
         >
           <img src="/hero/aboutme.webp" alt="" loading="lazy" />
 

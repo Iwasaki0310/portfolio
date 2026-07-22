@@ -192,12 +192,24 @@
   align-items: center;
   gap: 28px;
 }
+/*
+ * セクション見出し（.section-title）と同じ Playfair に揃える。
+ * --font-display（Space Grotesk）だとトップの見出し群から浮いていた。
+ */
 .drawerLink {
-  font-family: var(--font-display), sans-serif;
-  font-size: 1.6rem;
-  font-weight: 500;
-  letter-spacing: 0.1em;
+  font-family: var(--font-title), serif;
+  font-size: 1.75rem;
+  font-weight: 400;
+  letter-spacing: 0.02em;
   color: var(--text);
+}
+/* Playfair の & はカリグラフィ体で浮くため、明朝の素直な形に差し替える */
+.drawerAmp {
+  font-family: var(--font-serif), serif;
+  font-weight: 700;
+  font-size: 0.9em;
+  letter-spacing: 0;
+  padding-inline: 0.04em;
 }
 
 @media (min-width: 900px) {

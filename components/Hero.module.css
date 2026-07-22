@@ -439,23 +439,27 @@
 
 /* ============ モバイル（SP）専用：崩れ対策 ============ */
 @media (max-width: 899px) {
-  /* タイトルは上部に（人物と重ならないように） */
+  /*
+   * タイトルは上部へ。375x812 実測で、旧値だと人物の頭が「IWASAKI」に40px
+   * 食い込み、肩書き（.subtitle）は完全に隠れていた。タイトルを上げ、
+   * 人物を下げ＋ひと回り小さくして、顔の上端が肩書きの下に来るようにする。
+   */
   .titleBlock {
-    top: clamp(96px, 14vh, 170px);
+    top: clamp(84px, 12vh, 150px);
     transform: none;
     left: 24px;
   }
-  /* 人物は中央・大きめ・少し上へ */
   .person {
     left: 50%;
-    bottom: 11vh;
-    width: min(140vw, 540px);
+    bottom: 8vh;
+    width: min(125vw, 470px);
   }
   /* 左の雲：モバイルでは左下に配置（PCと同じ素材） */
   .cloudLeft {
     display: block;
     left: -40%;
-    bottom: 0;
+    /* 下端を画面外に少し逃がして、雲の裾を切り落とす */
+    bottom: -7%;
     /* 切り抜き（cover）せず画像全体を表示。下端は画面下に付けたまま
        大きくして雲を上まで見せる（隙間なく上げる）。左はみ出しOK */
     width: 180%;
@@ -470,7 +474,7 @@
     display: block;
     right: -38%;
     left: auto;
-    bottom: -4%;
+    bottom: -11%;
     width: 88%;
     height: 46%;
     object-position: 100% 100%;
